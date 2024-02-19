@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5f2d9652-8a45-43ed-bb2c-6637262057bf" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Admin/serializer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Admin/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Product/serializer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Product/signals.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Product/urls.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reclama/serializer.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Reclama/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/i-Shop_update.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/i-Shop_update.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admin/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admin/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admin/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admin/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Admin/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Admin/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/Config/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Config/urls.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Product/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/Product/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Product/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Product/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/User/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/User/models.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2byrrH0xGdZEvnZTDTzB3LyTlYo" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/macbook/Desktop/REAL_PROJECTS/i-Shop_update&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ]
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="i-Shop_update" type="Python.DjangoServer" factoryName="Django server">
+      <module name="i-Shop_update" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="launchJavascriptDebuger" value="false" />
+      <option name="port" value="8000" />
+      <option name="host" value="" />
+      <option name="additionalOptions" value="" />
+      <option name="browserUrl" value="" />
+      <option name="runTestServer" value="false" />
+      <option name="runNoReload" value="false" />
+      <option name="useCustomRunCommand" value="false" />
+      <option name="customRunCommand" value="" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5f2d9652-8a45-43ed-bb2c-6637262057bf" name="Changes" comment="" />
+      <created>1707198360913</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1707198360913</updated>
+      <workItem from="1707198366109" duration="13660000" />
+      <workItem from="1707379605392" duration="3412000" />
+      <workItem from="1707386997279" duration="1505000" />
+      <workItem from="1707418352059" duration="859000" />
+      <workItem from="1707476932233" duration="36000" />
+      <workItem from="1707485870973" duration="2483000" />
+      <workItem from="1707543429526" duration="11418000" />
+      <workItem from="1707771751639" duration="10225000" />
+      <workItem from="1707977693610" duration="2664000" />
+      <workItem from="1708065204272" duration="4577000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
