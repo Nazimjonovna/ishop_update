@@ -1,6 +1,6 @@
 from django.db import models
 from Admin.models import Admin, Protsent
-
+# omonga 
 
 class Product(models.Model):
     quantity = models.IntegerField(null=True)
