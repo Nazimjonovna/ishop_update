@@ -10,6 +10,7 @@ class User(models.Model):
     otp = models.CharField(max_length=4, null=True)
     card = models.IntegerField()
     card_info = models.CharField(max_length=4)
+    password = models.CharField(max_length=8)
 
     def __str__(self):
         return self.name
