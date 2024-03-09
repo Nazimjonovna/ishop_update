@@ -4,6 +4,8 @@ import random
 import string
 from .models import *
 from .serializer import *
+from Product.models import *
+from Product.serializer import *
 
 # Create your views here.
 def generate_random_string(length):
@@ -99,9 +101,53 @@ class GetSonProduct(APIView):
             })
         else:
             return Response({"Message":"uzr ushbu ma'lumotlar faqat boshliq uchun beriladi"})
+        
+class GetAdminProductsView(APIView):
+    def get(self, request, id):
+        quantity = {}
+        admin = Admin.objects.filter(id = id).first()
+        if admin.is_boss:
+            admins = Admin.objects.all()
+            for admin in admins:
+                if admins.is_boss == False:
+                    orders = Order.objects.filter(admin = admin)
+                    quantity[f'{admin.name}'] = list(orders)
+                else:
+                    continue
+            return Response({"Message":"Adminlar qo'shgan mahsulotlar haqida hisobot", 'data':quantity})
+        else:
+            return Response({"Message":"uzr ushbu ma'lumotlar faqat boshliq uchun beriladi"})
+
 
 
 # orderla qop ketdi
+
+class EditOrderStatusView(APIView):
+    def post(self, request, id):
+        order = Order.objects.filter(id = id).first()
+        if order:
+            order.state = request.data.get('state')
+            order.save()
+            serializer = OrderSerializer(order)
+            return Response({"Message":"Buyutma statusi o'zgartirildi", 'data':serializer.data})
+        else:
+            return Response({"Message":"Bunday buyurtma topilmadi"})
+        
+class GetOrderStatusView(APIView):
+    def get(self, request, id):
+        order_state = []
+        admin = Admin.objects.filter(id = id).first()
+        if admin:
+            orders = Order.objects.all()
+            for order in orders:
+                if order.state == 'buyurtma_berish':
+                    order_state.append(order)
+                else:
+                    continue
+            serializer = OrderSerializer(order_state, many = True)
+            return Response({"Message":"Aktiv buyurtmalar", 'data':serializer.data})
+        else:
+            return Response({"Message":"uzr ushbu ma'lumotlar faqat admin uchun beriladi"})
 
 
 

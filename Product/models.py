@@ -1,14 +1,12 @@
 from django.db import models
 from Admin.models import Admin, Protsent
-
-
-class Costs(models.Model):
-    costs = models.IntegerField()
-    def __str__(self):
-        return str(self.costs)
+from Partner.models import *
+from django.core.validators import RegexValidator
+from User.models import User
 
 
 class Product(models.Model):
+    partner = models.ForeignKey(Partner, on_delete = models.CASCADE, null = True, blank = True)
     quantity = models.IntegerField(null=True)
     cost = models.FloatField(null=True)
     time = models.DateTimeField(auto_now=True)
@@ -16,23 +14,16 @@ class Product(models.Model):
     postavshik = models.CharField(max_length=2000, null=True)
     admin = models.ForeignKey(Admin, on_delete=models.CASCADE, null=True, blank=True)
     tasdiq = models.BooleanField(default=False)
-    cre_cost = models.ManyToManyField(Costs)
+    cre_cost = models.JSONField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        if not self.cre_cost.exists():
-            default_cost = Costs.objects.create(costs=0)
-            self.cre_cost.add(default_cost)
-
-        new_cre_cost_instances = []
-
-        for protsent_instance in self.protsent.all():
-            calculated_cost = self.cost * (1 + (protsent_instance.protsent / 100)) / 12
-            cost_instance = Costs.objects.create(costs=calculated_cost)
-            new_cre_cost_instances.append(cost_instance)
-        self.cre_cost.clear()
-        self.cre_cost.add(*new_cre_cost_instances)
+            if self.pk is None:
+                admin_instances = Protsent.objects.all()
+                cre_cost_dict = {}
+                for admin_instance in admin_instances:
+                    cre_cost_dict[admin_instance.pk] = admin_instance.protsent * self.cost
+                self.cre_cost = cre_cost_dict
+            super().save(*args, **kwargs)
 
 
 class Category(models.Model):
@@ -143,3 +134,48 @@ class RecPro(models.Model):
 
     def __str__(self):
         return str(self.is_rec)
+
+
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
+    name_credit = models.ForeignKey(Protsent, on_delete = models.CASCADE)
+    time = models.DateTimeField(auto_now=True)
+    stat = (
+        ('buyurtma_berish', 'buyurtma_berish'),
+        ('buyurtma_tayyorlanmoqda', 'buyurtma_tayyorlanmoqda'),
+        ('yetkazib_berish_jarayoni', 'yetkazib_berish_jarayoni'),
+        ('yetkazilgan', 'yetkazilgan'),
+        ('bekor_qilingan', 'bekor_qilingan')
+    )
+    state = models.CharField(max_length=200, choices=stat, default='buyurtma_berish')
+    pay = (
+        ('naqt', 'naqt'),
+        ('card', 'card'),
+        ('credit', 'credit')
+    )
+    payment = models.CharField(max_length=100, choices=pay, default='naqt')
+    quantity = models.IntegerField(null=True)
+    rat = (
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5')
+    )
+    rate = models.CharField(max_length=10, choices=rat, default=1, null=True)
+    pro = (
+        ('is_buy', 'is_buy'),
+        ('is_like', 'is_like')
+    )
+    pro_x = models.CharField(max_length=50, choices=pro, null=True)
+    oy = models.IntegerField()
+    phone_regex = RegexValidator(regex='d{0,9}', message="Telefon raqamini +998XXXXXXXXX kabi kiriting!")
+    phone_cre = models.CharField(validators=[phone_regex], max_length=9, unique=True, null=True)
+    tasdiq = models.BooleanField(null=True)
+    color = models.CharField(max_length=120, null=True)
+    cost_order = models.FloatField(blank=True, null=True)
+
+    def str(self):
+        return str(self.time)

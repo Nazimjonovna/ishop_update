@@ -51,3 +51,9 @@ class ProductSerializer(serializers.ModelSerializer):
         subcategory = obj.productinfo_set.first().subcategory
         category = subcategory.category
         return CategorySerializer(category).data
+    
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = '__all__'

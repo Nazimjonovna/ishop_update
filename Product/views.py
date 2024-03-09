@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from .models import *
 from .serializer import *
 from Admin.models import *
+from User.models import User
+from Admin.models import *
 
 # Create your views here.
 class CreateCategoryView(APIView):
@@ -125,5 +127,155 @@ class GetProductView(APIView):
             result['products'].append(pro)
         return Response({"Message":"Mahsulotlar ro'yhati", "products":result})
 
+
+class PostOrderView(APIView):
+    def post(self, request, id):
+        user = User.objects.filter(id = id).first()
+        if user:
+            serializer = OrderSerializer(data = request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"Message":"Buyurtma qabul qilindi", "data":serializer.data})
+            else:
+                return Response({"Message":f"Sizdagi xatolik---{serializer.errors}"})
+        else:
+            return Response({"Message":"Siz hali ro'yhatdan o'tmagansiz"})
+
+class GetOrderView(APIView):
+    def get(self, request, id):
+        summa = 0
+        user = User.objects.filter(id = id).first()
+        if user:
+            orders = Order.objects.filter(user = user)
+            if order:
+                for order in orders:
+                    summa += order.cost_order
+                serializer = OrderSerializer(orders, many = True)
+                return Response({"Message":"Sizning barcha buyurtmalaringiz", 'data':serializer.data, "allsumm":str(summa)})
+            else:
+                return Response({"Message":"Sizda hozircha aktiv buyurtmalar topilmadi"})
+        else:
+            return Response({"Messsage":"Siz hali ro'yhatdan o'tmagansiz"})
+        
+    
+class GetOneOrderView(APIView):
+    def get(self, request, id):
+        order = Order.objects.filter(id = id).first()
+        if order:
+            if order.payment == 'credit':
+                cost = order.product.cost
+                oy = order.oy
+                name = order.name_credit
+                protsent = Protsent.objects.filter(name = name).first()
+                order_summ = float(cost)*(1+float(protsent/100))*float(order.quantity)/float(oy)
+                serializer = OrderSerializer(order)
+                return Response({"Message":f"Sizning buyurtmangiz---{serializer.data}", "allsumm":str(order_summ)})
+            elif order.payment == 'naqt' and order.payment == 'card':
+                cost = order.product.cost
+                order_summ = float(cost) * float(order.quantity)
+                serializer = Order(order)
+                return Response({"message":f"Sizning buyurtmangiz---{serializer.data}", "allsumm":str(order_summ)})
+            else:
+                return Response({"Message":"To'lov turi kiritilmagan"})
+            
+        else:
+            return Response({"Message":"Sizda hozircha aktiv buyurtma yoq"})
+        
+
+class OrderEditView(APIView):
+    def patch(self, request, id):
+        order = Order.objects.filter(id = id).first()
+        if order:
+            serializer = OrderSerializer(instanse = order, data = request.data, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"Message":"Sizning buyurtmangiz muvaffiqiyatli o'zgartirildi", 'data':serializer.data})
+            else:
+                return Response({"Message":f"Sizning erroringiz---{serializer.errors}"})
+        else:
+            return Response({"Message":"Bunday order yoq"})
+        
+    def delete(self, request, id):
+        order = Order.objects.filter(id = id).first()
+        if order:
+            order.delete()
+            return Response({"Message":"Buyurtma bekor qilindi"})
+        else:
+            return Response({"Message":"Bunday buyurtma topilmadi"})
+        
+class BasketView(APIView):
+    def get(self, request, id):
+        basket = []
+        pro = []
+        pro_info = []
+        images = []
+        user = User.objects.filter(id = id).first()
+        if user:
+            orders = Order.objects.filter(user = user)
+            for order in orders:
+                if order.state == 'buyurtma_berish' and order.pro_x == "is_buy" or order.pro_x == 'is_like':
+                    product = Product.objects.get(id = order.product)
+                    img = Image.objects.filter(product = order.product)
+                    info = ProductInfo.objects.filter(product = order.product)
+                    basket.append(order)
+                    pro.append(product)
+                    pro_info.append(info)
+                    images.append(img)
+                else:
+                    continue
+            serializer = OrderSerializer(basket, many = True)
+            seri_product = ProductSerializer(pro, many = True)
+            seri_info = ProductInfoSerializer(pro_info, many = True)
+            seri_img = ImageSerializer(images, many =True)
+            return Response({"Message":"Sizning savatchangiz", 
+                             'order':serializer.data,
+                             'product':seri_product.data,
+                             'info':seri_info.data,
+                             'images':seri_img.data})
+        else:
+            return Response({'Message':"Siz ro'yhatdan o'tmagansiz"})
+        
+        
+        
+class GetLikedOrdersView(APIView):
+    def get(self, request, id):
+        basket = []
+        pro = []
+        pro_info = []
+        images = []
+        user = User.objects.filter(id = id).first()
+        if user:
+            orders = Order.objects.filter(user = user)
+            for order in orders:
+                if order.pro_x == 'is_like':
+                    product = Product.objects.get(id = order.product)
+                    img = Image.objects.filter(product = order.product)
+                    info = ProductInfo.objects.filter(product = order.product)
+                    basket.append(order)
+                    pro.append(product)
+                    pro_info.append(info)
+                    images.append(img)
+                else:
+                    continue
+            serializer = OrderSerializer(basket, many = True)
+            seri_product = ProductSerializer(pro, many = True)
+            seri_info = ProductInfoSerializer(pro_info, many = True)
+            seri_img = ImageSerializer(images, many =True)
+            return Response({"Message":"Sizning savatchangiz", 
+                             'order':serializer.data,
+                             'product':seri_product.data,
+                             'info':seri_info.data,
+                             'images':seri_img.data})
+        else:
+            return Response({'Message':"Siz ro'yhatdan o'tmagansiz"})
+
+
+        
+
+            
+
+
+
+        
 
 
