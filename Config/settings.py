@@ -84,10 +84,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'ishopuzupdate',
-        'USERNAME':"macbook",
+        'USER':"postgres",
         'PASSWORD':'0200',
         'HOST':'localhost',
-        'PORT':'5433'
+        'PORT':'5432'
     }
 }
 
