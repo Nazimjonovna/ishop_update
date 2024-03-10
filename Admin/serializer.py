@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import *
+from Product.models import *
 
 class AdminSRL(serializers.ModelSerializer):
     class Meta:
