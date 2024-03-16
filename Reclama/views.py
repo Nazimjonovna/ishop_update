@@ -1,11 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 from .models import *
 from .serializer import *
 from Admin.models import *
 
 # Create your views here.
 class AddReclamaView(APIView):
+    @swagger_auto_schema(request_body = Reclamasrl)
     def post(self, request, id):
         admin = Admin.objects.filter(id = id).first()
         if admin:
@@ -24,6 +26,7 @@ class GetReclamaView(APIView):
         return Response(serializer.data)
 
 class AddCategoryRecView(APIView):
+    @swagger_auto_schema(request_body = CategoryRecsrl)
     def post(self, request, id):
         admin = Admin.objects.filter(id=id).first()
         if admin:
@@ -44,6 +47,7 @@ class GetCategoryRecView(APIView):
 
 
 class AddRecCardView(APIView):
+    @swagger_auto_schema(request_body = RecCardsrl)
     def post(self, request, id):
         admin = Admin.objects.filter(id=id).first()
         category = request.data.get('category')

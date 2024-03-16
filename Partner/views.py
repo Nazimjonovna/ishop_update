@@ -10,6 +10,7 @@ from Admin.models import Admin
 
 # Create your views here.
 class PostPartnerView(APIView):
+    @swagger_auto_schema(request_body = ParnerSerializer)
     def post(self, request, id):
         admin = Admin.objects.filter(id = id).first()
         if admin.is_boss:

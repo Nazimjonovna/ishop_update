@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-p2ux-imj80asb2y#$o()bkyn=33lgx&ce!o8+83s6zsn4g)86e
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['sharifjon.uz','localhost', '127.0.0.1']
 
 
 # Application definition
@@ -79,15 +79,24 @@ WSGI_APPLICATION = 'Config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+import os
 
 DATABASES = {
+    # pip install psycopg2
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ishopuzupdate',
-        'USER':"postgres",
-        'PASSWORD':'0200',
-        'HOST':'localhost',
-        'PORT':'5432'
+
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+
+        'NAME': os.environ.get('DB_NAME'),
+
+        'USER': os.environ.get('DB_USER'),
+
+        'PASSWORD': os.environ.get('DB_PASS'),
+
+        'HOST': os.environ.get('DB_HOST'),
+
+        'PORT': os.environ.get('PG_PORT'),
+
     }
 }
 
@@ -127,6 +136,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = (BASE_DIR / 'static')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

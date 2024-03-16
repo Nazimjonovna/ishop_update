@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  django-site:
+    build:
+      context: .
+    ports:
+      - "8001:8000"
+    env_file:
+      - .env
+    volumes:
+      - .:/ishop_update
+    command: python manage.py runserver 0.0.0.0:8000
+    depends_on:
+      - ishop
+
+  ishop:
+    container_name: ishop
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    ports:
+      - "5435:5435"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata: {}

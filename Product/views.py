@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 from .models import *
 from .serializer import *
 from Admin.models import *
@@ -9,7 +10,7 @@ from Admin.models import *
 # Create your views here.
 class CreateCategoryView(APIView):
     """ Admin yangi category qoshadi """
-
+    @swagger_auto_schema(request_body = CreateCategorySerializer)
     def update_choise(self):
         """ qo'shilgan category ni choise qilib chaqarish """
         category_names = Category.objects.values_list('name', flat=True)
@@ -32,7 +33,7 @@ class CreateCategoryView(APIView):
 
 class CreateSubCategoryView(APIView):
     """ Admin yangi subcategory qoshishi """
-
+    @swagger_auto_schema(request_body = CreateSubCategorySerializer)
     def update_choise(self):
         """ qo'shilgan subcategory ni choise qilib chaqarish """
         category_names = SubCategory.objects.values_list('name', flat=True)
@@ -57,7 +58,7 @@ class AddProdcutView(APIView):
     """ Faqat admin qo'shishini ta'minlash uchun id bilan tekshiriladi
         Yangi product qo'shish. Bunda hamma ma'lumotlarni bitta serializer
         bilan tekshirib olinadi."""
-
+    # @swagger_auto_schema(request_body = ProductSerializer)
     def post(self, request, id):
         admin = Admin.objects.filter(id = id).first()
         if admin:
@@ -90,6 +91,7 @@ class EditProduct(APIView):
         else:
             return Response({"Message":"Uzr siz tanlagan mahsulot bazada topilmadi)"})
 
+    # @swagger_auto_schema(request_body = ProductSerializer)
     def patch(self, request, id):
         product = Product.objects.filter(id = id).first()
         if product:
@@ -102,6 +104,7 @@ class EditProduct(APIView):
         else:
             return Response({"Message":"Uzr siz tanlagan mahsulot bazada topilmadi)"})
 
+    # @swagger_auto_schema(request_body = ProductSerializer)
     def delete(self, request, id):
         """ Bunda Product va ProductInfo hamda Image modellari o'zaro
             on_delete funksiyati bilan bog'langanligi sababli alohida
@@ -129,6 +132,7 @@ class GetProductView(APIView):
 
 
 class PostOrderView(APIView):
+    @swagger_auto_schema(request_body = OrderSerializer)
     def post(self, request, id):
         user = User.objects.filter(id = id).first()
         if user:
@@ -183,6 +187,7 @@ class GetOneOrderView(APIView):
         
 
 class OrderEditView(APIView):
+    @swagger_auto_schema(request_body = OrderSerializer)
     def patch(self, request, id):
         order = Order.objects.filter(id = id).first()
         if order:
@@ -195,6 +200,7 @@ class OrderEditView(APIView):
         else:
             return Response({"Message":"Bunday order yoq"})
         
+    @swagger_auto_schema(request_body = OrderSerializer)
     def delete(self, request, id):
         order = Order.objects.filter(id = id).first()
         if order:

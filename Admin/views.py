@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
 import random
 import string
 from .models import *
@@ -34,6 +35,7 @@ class AddAdminView(APIView):
 
 
 class LoginAdminview(APIView):
+    @swagger_auto_schema(request_body = AdminSRL)
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
@@ -45,6 +47,7 @@ class LoginAdminview(APIView):
             return Response({"Message":"Uzr bazadan bunday admin topilmadi"})
 
 class AddProtsent(APIView):
+    @swagger_auto_schema(request_body = Protsentsrl)
     def post(self, request, id):
         admin = Admin.objects.filter(id = id).first()
         if admin:
@@ -58,6 +61,7 @@ class AddProtsent(APIView):
             return Response({"Message":"Uzr bazada bunday admin topilmadi"})
 
 class EditTasdiqView(APIView):
+    @swagger_auto_schema(request_body = Protsentsrl)
     def patch(self, request, id):
         admin = Admin.objects.filter(id = id).first()
         if admin:
@@ -123,6 +127,7 @@ class GetAdminProductsView(APIView):
 # orderla qop ketdi
 
 class EditOrderStatusView(APIView):
+    @swagger_auto_schema(request_body = OrderSerializer)
     def post(self, request, id):
         order = Order.objects.filter(id = id).first()
         if order:
