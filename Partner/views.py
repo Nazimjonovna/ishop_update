@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from .models import *
@@ -10,6 +11,8 @@ from Admin.models import Admin
 
 # Create your views here.
 class PostPartnerView(APIView):
+    permission_classes = [AllowAny, ]
+
     @swagger_auto_schema(request_body = ParnerSerializer)
     def post(self, request, id):
         admin = Admin.objects.filter(id = id).first()
@@ -24,6 +27,8 @@ class PostPartnerView(APIView):
             return Response({"Message":"Hamkorlarni qo'shish faqat superadmin uchun"})
         
 class GetPartnerView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         admin = Admin.objects.filter(id = id).first()
         if admin:
@@ -33,39 +38,50 @@ class GetPartnerView(APIView):
             return Response({"Message":"Hamkorlarni qo'shish faqat admin uchun"})
         
 class EditPartnerView(APIView):
+    permission_classes = [AllowAny, ]
+    
     @swagger_auto_schema(request_body = EditPartnerSerializer)
     def post(self, request, id):
         admin = Admin.objects.filter(id = id).first()
-        if admin.is_boss:
-            partner = Partner.objects.filter(name = request.data.get('name')).first()
-            serializer = ParnerSerializer(partner, many = True)
-            return Response({"Message":"Izlagan hamkoringiz", 'data':serializer.data})
+        if admin:
+            if admin.is_boss:
+                partner = Partner.objects.filter(name = request.data.get('name')).first()
+                serializer = ParnerSerializer(partner, many = True)
+                return Response({"Message":"Izlagan hamkoringiz", 'data':serializer.data})
+            else:
+                return Response({"Message":"Bu amaliyotni faqat superadmin amalga oshira oladi"})
         else:
-            return Response({"Message":"Bu amaliyotni faqat superadmin amalga oshira oladi"})
+            return Response({'Message':'Uzr bazada bunday admin topilmadi'})
         
     @swagger_auto_schema(request_body = EditPartnerSerializer)
     def patch(self, request, id):
         admin = Admin.objects.filter(id = id).first()
-        if admin.is_boss:
-            partner = Partner.objects.filter(name = request.data.get('name')).first()
-            serializer = ParnerSerializer(instance = partner, data = request.data, partial = True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response({"Message":"Hamkor ma'lumotlari o'zgartirildi", 'data':serializer.data})
+        if admin:
+            if admin.is_boss:
+                partner = Partner.objects.filter(name = request.data.get('name')).first()
+                serializer = ParnerSerializer(instance = partner, data = request.data, partial = True)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response({"Message":"Hamkor ma'lumotlari o'zgartirildi", 'data':serializer.data})
+                else:
+                    return Response({"Message"f"Sizning xatoyingiz---{serializer.errors}"})
             else:
-                return Response({"Message"f"Sizning xatoyingiz---{serializer.errors}"})
+                return Response({"Message":"Bu amaliyotni faqat superadmin amalga oshira oladi"})
         else:
-            return Response({"Message":"Bu amaliyotni faqat superadmin amalga oshira oladi"})
+            return Response({'Message':'Uzr bazada bunday admin topilmadi'})
         
     @swagger_auto_schema(request_body = EditPartnerSerializer)
     def delete(self, request, id):
         admin = Admin.objects.filter(id = id).first()
-        if admin.is_boss:
-            partner = Partner.objects.filter(name = request.data.get('name')).first()
-            partner.delete()
-            return Response({"Message":"Hamkor o'chirildi"})
+        if admin:
+            if admin.is_boss:
+                partner = Partner.objects.filter(name = request.data.get('name')).first()
+                partner.delete()
+                return Response({"Message":"Hamkor o'chirildi"})
+            else:
+                return Response({"Message":"Bu amaliyotni faqat superadmin amalga oshira oladi"})
         else:
-            return Response({"Message":"Bu amaliyotni faqat superadmin amalga oshira oladi"})
+            return Response({'Message':'Uzr bazada bunday admin topilmadi'})
         
 
         

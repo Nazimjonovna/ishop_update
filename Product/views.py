@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from drf_yasg.utils import swagger_auto_schema
 from .models import *
 from .serializer import *
@@ -9,6 +10,8 @@ from Admin.models import *
 
 # Create your views here.
 class CreateCategoryView(APIView):
+    permission_classes = [AllowAny, ]
+
     """ Admin yangi category qoshadi """
     @swagger_auto_schema(request_body = CreateCategorySerializer)
     def update_choise(self):
@@ -32,6 +35,8 @@ class CreateCategoryView(APIView):
 
 
 class CreateSubCategoryView(APIView):
+    permission_classes = [AllowAny, ]
+
     """ Admin yangi subcategory qoshishi """
     @swagger_auto_schema(request_body = CreateSubCategorySerializer)
     def update_choise(self):
@@ -55,6 +60,8 @@ class CreateSubCategoryView(APIView):
 
 
 class AddProdcutView(APIView):
+    permission_classes = [AllowAny, ]
+
     """ Faqat admin qo'shishini ta'minlash uchun id bilan tekshiriladi
         Yangi product qo'shish. Bunda hamma ma'lumotlarni bitta serializer
         bilan tekshirib olinadi."""
@@ -72,6 +79,8 @@ class AddProdcutView(APIView):
             return Response({"Message":"Uzr siz admin emasligingiz sababli category qo'sha olmaysz)"})
 
 class EditProduct(APIView):
+    permission_classes = [AllowAny, ]
+
     """ Product haqidagi ma'luumotlar ustida ishlash view si.
         Bunda 1ta product ma'lumotlarini olish, o'zgartirish yokida
         o'chirish imkoniyati mavjud."""
@@ -118,6 +127,8 @@ class EditProduct(APIView):
 
 
 class GetProductView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self,request):
         products = Product.objects.filter(tasdiq = True)
         result = {"products": []}
@@ -132,6 +143,8 @@ class GetProductView(APIView):
 
 
 class PostOrderView(APIView):
+    permission_classes = [AllowAny, ]
+
     @swagger_auto_schema(request_body = OrderSerializer)
     def post(self, request, id):
         user = Users.objects.filter(id = id).first()
@@ -146,6 +159,8 @@ class PostOrderView(APIView):
             return Response({"Message":"Siz hali ro'yhatdan o'tmagansiz"})
 
 class GetOrderView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         summa = 0
         user = Users.objects.filter(id = id).first()
@@ -163,6 +178,8 @@ class GetOrderView(APIView):
         
     
 class GetOneOrderView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         order = Order.objects.filter(id = id).first()
         if order:
@@ -187,6 +204,8 @@ class GetOneOrderView(APIView):
         
 
 class OrderEditView(APIView):
+    permission_classes = [AllowAny, ]
+
     @swagger_auto_schema(request_body = OrderSerializer)
     def patch(self, request, id):
         order = Order.objects.filter(id = id).first()
@@ -210,6 +229,8 @@ class OrderEditView(APIView):
             return Response({"Message":"Bunday buyurtma topilmadi"})
         
 class BasketView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         basket = []
         pro = []
@@ -244,6 +265,8 @@ class BasketView(APIView):
         
         
 class GetLikedOrdersView(APIView):
+    permission_classes = [AllowAny, ]
+    
     def get(self, request, id):
         basket = []
         pro = []

@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from drf_yasg.utils import swagger_auto_schema
 import random
 import string
@@ -22,19 +23,26 @@ def password_generate(length):
             return str(a)
 
 class AddAdminView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         admin = Admin.objects.filter(id = id).first()
-        if admin.is_boss:
-            username = generate_random_string(6)
-            password = password_generate(6)
-            new_admin = Admin.objects.create(username = username, password = password)
-            serializer = AdminSRL(new_admin)
-            return Response(serializer.data)
+        if admin:
+            if admin.is_boss:
+                username = generate_random_string(6)
+                password = password_generate(6)
+                new_admin = Admin.objects.create(username = username, password = password)
+                serializer = AdminSRL(new_admin)
+                return Response(serializer.data)
+            else:
+                return Response("Yangi admin faqat superadmin tomonidan qo'shiladi!")
         else:
-            return Response("Yangi admin faqat superadmin tomonidan qo'shiladi!")
+            return Response("Bunday admin mavjud emas")
 
 
 class LoginAdminview(APIView):
+    permission_classes = [AllowAny, ]
+
     @swagger_auto_schema(request_body = AdminSRL)
     def post(self, request):
         username = request.data.get('username')
@@ -47,6 +55,8 @@ class LoginAdminview(APIView):
             return Response({"Message":"Uzr bazadan bunday admin topilmadi"})
 
 class AddProtsent(APIView):
+    permission_classes = [AllowAny, ]
+
     @swagger_auto_schema(request_body = Protsentsrl)
     def post(self, request, id):
         admin = Admin.objects.filter(id = id).first()
@@ -61,6 +71,8 @@ class AddProtsent(APIView):
             return Response({"Message":"Uzr bazada bunday admin topilmadi"})
 
 class EditTasdiqView(APIView):
+    permission_classes = [AllowAny, ]
+
     @swagger_auto_schema(request_body = Protsentsrl)
     def patch(self, request, id):
         admin = Admin.objects.filter(id = id).first()
@@ -78,6 +90,8 @@ class EditTasdiqView(APIView):
 
 
 class GetSonProduct(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         admin = Admin.objects.filter(id = id).first()
         t_son = 0
@@ -85,48 +99,59 @@ class GetSonProduct(APIView):
         jami = 0
         tasdiqlangan = []
         tasdiqlanmagan = []
-        if admin.is_boss:
-            products = Product.objects.all()
-            for product in products:
-                if product.tasdiq:
-                    t_son += 1
-                    tasdiqlangan.append(product)
-                else:
-                    tm_son += 1
-                    tasdiqlanmagan.append(product)
-            jami = t_son + tm_son
-            return Response({
-                "Message":"Tasdiqlangan va tasdiqlanmagan tovarlar ro'yhati",
-                "Jami mahsulotlar soni":str(jami),
-                'Tasdiqlanganlar soni':str(t_son),
-                'Tasdiqlanganlar':list(tasdiqlangan),
-                'Tasdiqlanmaganlar soni': str(tm_son),
-                'Tasdiqlanmaganlar':list(tasdiqlanmagan)
-            })
+        if admin:
+            if admin.is_boss:
+                products = Product.objects.all()
+                for product in products:
+                    if product.tasdiq:
+                        t_son += 1
+                        tasdiqlangan.append(product)
+                    else:
+                        tm_son += 1
+                        tasdiqlanmagan.append(product)
+                jami = t_son + tm_son
+                return Response({
+                    "Message":"Tasdiqlangan va tasdiqlanmagan tovarlar ro'yhati",
+                    "Jami mahsulotlar soni":str(jami),
+                    'Tasdiqlanganlar soni':str(t_son),
+                    'Tasdiqlanganlar':list(tasdiqlangan),
+                    'Tasdiqlanmaganlar soni': str(tm_son),
+                    'Tasdiqlanmaganlar':list(tasdiqlanmagan)
+                })
+            else:
+                return Response({"Message":"uzr ushbu ma'lumotlar faqat boshliq uchun beriladi"})
         else:
-            return Response({"Message":"uzr ushbu ma'lumotlar faqat boshliq uchun beriladi"})
+            return Response({'Message':'Uzr bazada bunday admin topilmadi'})
         
 class GetAdminProductsView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         quantity = {}
         admin = Admin.objects.filter(id = id).first()
-        if admin.is_boss:
-            admins = Admin.objects.all()
-            for admin in admins:
-                if admins.is_boss == False:
-                    orders = Order.objects.filter(admin = admin)
-                    quantity[f'{admin.name}'] = list(orders)
-                else:
-                    continue
-            return Response({"Message":"Adminlar qo'shgan mahsulotlar haqida hisobot", 'data':quantity})
+        if admin:
+            if admin.is_boss:
+                admins = Admin.objects.all()
+                for admin in admins:
+                    if admins.is_boss == False:
+                        orders = Order.objects.filter(admin = admin)
+                        quantity[f'{admin.name}'] = list(orders)
+                    else:
+                        continue
+                return Response({"Message":"Adminlar qo'shgan mahsulotlar haqida hisobot", 'data':quantity})
+            else:
+                return Response({"Message":"uzr ushbu ma'lumotlar faqat boshliq uchun beriladi"})
         else:
-            return Response({"Message":"uzr ushbu ma'lumotlar faqat boshliq uchun beriladi"})
+            return Response({"Message":"Uzr bazadan bunday admin topilmadi"})
+
 
 
 
 # orderla qop ketdi
 
 class EditOrderStatusView(APIView):
+    permission_classes = [AllowAny, ]
+
     @swagger_auto_schema(request_body = OrderSerializer)
     def post(self, request, id):
         order = Order.objects.filter(id = id).first()
@@ -139,6 +164,8 @@ class EditOrderStatusView(APIView):
             return Response({"Message":"Bunday buyurtma topilmadi"})
         
 class GetOrderStatusView(APIView):
+    permission_classes = [AllowAny, ]
+
     def get(self, request, id):
         order_state = []
         admin = Admin.objects.filter(id = id).first()
