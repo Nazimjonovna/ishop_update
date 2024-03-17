@@ -4,7 +4,7 @@ from drf_yasg.utils import swagger_auto_schema
 from .models import *
 from .serializer import *
 from Admin.models import *
-from User.models import User
+from User.models import Users
 from Admin.models import *
 
 # Create your views here.
@@ -134,7 +134,7 @@ class GetProductView(APIView):
 class PostOrderView(APIView):
     @swagger_auto_schema(request_body = OrderSerializer)
     def post(self, request, id):
-        user = User.objects.filter(id = id).first()
+        user = Users.objects.filter(id = id).first()
         if user:
             serializer = OrderSerializer(data = request.data)
             if serializer.is_valid():
@@ -148,7 +148,7 @@ class PostOrderView(APIView):
 class GetOrderView(APIView):
     def get(self, request, id):
         summa = 0
-        user = User.objects.filter(id = id).first()
+        user = Users.objects.filter(id = id).first()
         if user:
             orders = Order.objects.filter(user = user)
             if order:
@@ -215,7 +215,7 @@ class BasketView(APIView):
         pro = []
         pro_info = []
         images = []
-        user = User.objects.filter(id = id).first()
+        user = Users.objects.filter(id = id).first()
         if user:
             orders = Order.objects.filter(user = user)
             for order in orders:
@@ -249,7 +249,7 @@ class GetLikedOrdersView(APIView):
         pro = []
         pro_info = []
         images = []
-        user = User.objects.filter(id = id).first()
+        user = Users.objects.filter(id = id).first()
         if user:
             orders = Order.objects.filter(user = user)
             for order in orders:

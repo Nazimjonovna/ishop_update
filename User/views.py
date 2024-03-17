@@ -16,20 +16,17 @@ from rest_framework import status, parsers
 from .models import *
 from .serializer import *
 
-# Create your views here.
 utc = pytz.timezone(settings.TIME_ZONE)
 min = 1
-
-# Create your views here.
 def send_sms(phone_number, step_reset=None, change_phone=None):
     try:
-        verify_code = randint(111111, 999999)
+        verify_code = randint(1111, 9999)
         try:
             obj = Verification.objects.get(phone=phone_number)
         except Verification.DoesNotExist:
             obj = Verification(phone=phone_number, verify_code=verify_code)
-            obj.step_reset = step_reset
-            obj.step_change_phone = change_phone
+            obj.step_reset=step_reset 
+            obj.step_change_phone=change_phone
             obj.save()
             context = {'phone_number': str(obj.phone), 'verify_code': obj.verify_code,
                        'lifetime': _(f"{min} minutes")}
@@ -42,28 +39,31 @@ def send_sms(phone_number, step_reset=None, change_phone=None):
             return {'message': _(f"Try again in {time_left[3:4]} minute {time_left[5:7]} seconds")}
         obj.delete()
         obj = Verification(phone=phone_number)
-        obj.verify_code = verify_code
-        obj.step_reset = step_reset
-        obj.step_change_phone = change_phone
+        obj.verify_code=verify_code 
+        obj.step_reset=step_reset
+        obj.step_change_phone=change_phone
         obj.save()
         context = {'phone_number': str(obj.phone), 'verify_code': obj.verify_code, 'lifetime': _(f"{min} minutes")}
         return context
     except Exception as e:
         print(f"\n[ERROR] error in send_sms <<<{e}>>>\n")
 
-# requests.post("http://sms-service.m1.uz/send_sms/", {"phone_number": 998901361752, "text": "Hello"})
+# import requests
+
+# requests.post("http://sms-service.m1.uz/send_sms/", {"phone_number":998901361752, "text":"Hello"})
 
 
 class SendSms(generics.CreateAPIView):
     permission_classes = [AllowAny]
     serializer_class = SendSmsSerializer
 
+    
     def post(self, request):
         serializer = SendSmsSerializer(data=request.data)
         if serializer.is_valid():
-            login = "Name_of_work"
+            login = "QUANTIC"
             password = "B180Ns49DnRbuPX9686R"
-            nickname = "ShopUz"
+            nickname = "QuanticUz"
 
             message = Getsms(login=login, password=password, nickname=nickname)
             phone_numbers = [serializer.data['phone_number']]
@@ -77,16 +77,19 @@ class SendSms(generics.CreateAPIView):
                 print(result)
             return Response({"msg": f"Send SMS successfully to {serializer.data['phone_number']}"})
         else:
-            return Response({"msg": serializer.errors})
+            return Response({"msg":serializer.errors})
 
 
 class PhoneView(APIView):
+    queryset = Users.objects.all()
+    serializer_class = PhoneSRL
+    permission_classes = [AllowAny]
 
-    @swagger_auto_schema(request_body=PhoneSRL, tags=['Phone'])
-    def post(self, request):
+    @swagger_auto_schema(request_body=PhoneSRL, tags = ['Register'])
+    def post(self, request, *args, **kwargs):
         phone_number = request.data.get("phone")
-        if phone_number is not None and phone_number.isdigit() and len(phone_number) > 8:
-            user = User.objects.filter(phone__iexact=phone_number)
+        if phone_number.isdigit() and len(phone_number)>8:
+            user = Users.objects.filter(phone__iexact=phone_number)
             if user.exists():
                 return Response({
                     "status": False,
@@ -100,9 +103,9 @@ class PhoneView(APIView):
                         validate = ValidatedOtp.objects.get(phone=phone_number)
                         if validate.validated:
                             validate.otp = code
-                            validate.validated = False
+                            validate.validated= False
                             validate.save()
-
+                        
                     except ValidatedOtp.DoesNotExist as e:
                         phon = ValidatedOtp.objects.filter(phone__iexact=phone_number)
                         if not phon.exists():
@@ -113,20 +116,21 @@ class PhoneView(APIView):
                 return Response({
                     "status": True,
                     "detail": "SMS xabarnoma jo'natildi",
-                    "code": otp  # <--vaqtinchalik qo'shildi
+                    "code":otp #<--vaqtinchalik qo'shildi
                 })
         else:
-            if phone_number is not None and len(phone_number) < 8:
-                return Response({"detail": "Telefon raqamingizni kod bilan kiriting!"})
-            else:
+            if len(phone_number)<8:
+                return Response({"detail":"Telefon raqamingizni kod bilan kiriting!"})
+            else:    
                 return Response({
                     "status": False,
                     "detail": "Telefon raqamni kiriting ."
                 })
 
+
     def send_otp(phone, otp):
         if phone:
-            otp = randint(111111, 999999)
+            otp = randint(999, 9999)
             print(otp)
             return otp
         else:
@@ -169,33 +173,35 @@ class OtpView(APIView):
 
 class RegisterViewNaqt(APIView):
     permission_classes = [AllowAny]
-    serializer_classes = Register
+    serializer_classes=Register
 
-    @swagger_auto_schema(request_body=Register, tags=['Register'])
+    @swagger_auto_schema(request_body=Register, tags = ['Register'])
     def post(self, request):
         request.POST._mutable = True
         password = request.data['password'][:]
         request.data['password'] = make_password(password)
         serializer = True
         request.POST._mutable = True
-
+        
         try:
             verify = ValidatedOtp.objects.filter(phone__iexact=request.data['phone'], validated=True)
+            print(verify)
             if verify.exists():
                 if serializer:
-                    user_obj = User(phone=request.data['phone'])
+                    user_obj = Users(phone=request.data['phone'])
                     user_obj.password = request.data['password']
-                    user_obj.name = request.data['name']
+                    user_obj.name=request.data['name']
                     user_obj.save()
-                    access_token = AccessToken().for_user(user_obj)
-                    refresh_token = RefreshToken().for_user(user_obj)
-                    return Response({
-                        "access": str(access_token),
-                        "refresh": str(refresh_token),
-                        "phone": str(user_obj.phone),
-                        "name": str(user_obj.name),
-                        "password": str(user_obj.password)
-                    })
+
+            access_token = AccessToken().for_user(user_obj)
+            refresh_token = RefreshToken().for_user(user_obj)
+            return Response({
+                "access": str(access_token),
+                "refresh": str(refresh_token),
+                "phone": str(user_obj.phone),
+                "name": str(user_obj.name),
+                "password": str(user_obj.password)
+            })
 
         except:
             return Response({
@@ -209,18 +215,18 @@ class RegisterViewCredit(APIView):
     @swagger_auto_schema(request_body=Register, tags=['Register'])
     def post(self, request):
         serializer1 = Register(data=request.data)
-        serializer2 = Credit(data=request.data)
+        # serializer2 = Credit(data=request.data÷)
 
-        if serializer1.is_valid() and serializer2.is_valid():
+        if serializer1.is_valid() :
             try:
                 verify = ValidatedOtp.objects.filter(phone__iexact=request.data['phone'], validated=True)
                 if verify.exists():
                     user_data = serializer1.validated_data
                     user_data['password'] = make_password(user_data['password'])
-                    user_obj = User.objects.create(**user_data)
+                    user_obj = Users.objects.create(**user_data)
 
-                    credit_data = serializer2.validated_data
-                    credit_obj = Userdata.objects.create(user=user_obj, **credit_data)
+                    # credit_data = serializer2.validated_data
+                    # credit_obj = Userdata.objects.create(user=user_obj, **credit_data)
 
                     access_token = AccessToken().for_user(user_obj)
                     refresh_token = RefreshToken().for_user(user_obj)
@@ -242,21 +248,9 @@ class RegisterViewCredit(APIView):
         else:
             return Response({
                 "user_errors": serializer1.errors,
-                "credit_errors": serializer2.errors
+                # "credit_errors": serializer2.errors
             }, status=400)
-
-class CreditView(APIView):
-    def post(self, request, id):
-        user = User.objects.filter(id = id).first()
-        if user:
-            serializer = Credit(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            else:
-                return Response(serializer.errors)
-        else:
-            return Response('Bunday user yoq')
+        
 
 class LoginView(generics.GenericAPIView):
     permission_classes = [AllowAny, ]
@@ -265,12 +259,10 @@ class LoginView(generics.GenericAPIView):
     @swagger_auto_schema(request_body=Log)
     def post(self, request):
         try:
-            print("try")
-            user = User.objects.get(phone=request.data['phone'])
+            user = Users.objects.get(phone=request.data['phone'])
 
             if check_password(request.data['password'], user.password):
-                print('if')
-                phone = User.objects.get(phone=request.data['phone'])
+                phone = Users.objects.get(phone=request.data['phone'])
                 access_token = AccessToken().for_user(phone)
                 refresh_token = RefreshToken().for_user(phone)
                 return Response({
@@ -279,63 +271,54 @@ class LoginView(generics.GenericAPIView):
                     "refresh": str(refresh_token),
                 })
             else:
-                print('else')
                 return Response({'Xato': "Noto'g'ri password kiritdingiz :("})
 
         except:
-            print('except')
             return Response({'Xato': 'Bunday user mavjud emas :('})
 
 
-class UserAccView(APIView):
-
-    def get(self, request, *args, **kwargs):
-        userdata = Userdata.objects.all()
-        serializer = Accaunt(userdata, many=True)
-        return Response(serializer.data)
-
-
 class UserdataUpdateDeleteView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, ]
 
-    @swagger_auto_schema(tags=['Userdata'])
+    @swagger_auto_schema(tags=['User'])
     def get(self, request, pk):
+        userdata = Users.objects.get(pk=pk)
         try:
-            userdata = Userdata.objects.get(pk=pk)
-        except Userdata.DoesNotExist:
+            userdata = Users.objects.get(pk=pk)
+        except Users.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = Accaunt(userdata)
+        serializer = Register(userdata)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @swagger_auto_schema(request_body=Accaunt, tags=['Userdata'])
+    @swagger_auto_schema(request_body=Register, tags=['User'])
     def patch(self, request, pk):
         try:
-            userdata = Userdata.objects.get(pk=pk)
-        except Userdata.DoesNotExist:
+            userdata = Users.objects.get(pk=pk)
+        except Users.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        serializer = Accaunt(instance=userdata, data=request.data, partial=True)
+        serializer = Register(instance=userdata, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @swagger_auto_schema(tags=['Userdata'])
+    @swagger_auto_schema(tags=['User'])
     def delete(self, request, pk):
         try:
-            userdata = Userdata.objects.get(pk=pk)
-        except Userdata.DoesNotExist:
+            userdata = Users.objects.get(pk=pk)
+        except Users.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
-        user = userdata.user
         userdata.delete()
-        user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
 class ChangePasswordView(generics.UpdateAPIView):
 
-    queryset = User.objects.all()
+    queryset = Users.objects.all()
     permission_classes = (IsAuthenticated,)
     serializer_class = ChangePasswordSerializer
     my_tags = ['Change-Password']
@@ -384,7 +367,7 @@ class ResetPasswordView(APIView):
         data = request.data
         if data.get('phone'):
             phone = data['phone']
-            user = User.objects.filter(phone__iexact=phone)
+            user = Users.objects.filter(phone__iexact=phone)
             if user.exists():
                 user = user.first()
                 context = send_sms(phone)
@@ -402,7 +385,7 @@ class ResetPasswordConfirm(APIView):
     @swagger_auto_schema(request_body=ResetPasswordSerializer, tags=['Password-Reset'])
     def put(self, request, *args, **kwargs):
         try:
-            user = User.objects.get(phone=request.data['phone'])
+            user = Users.objects.get(phone=request.data['phone'])
         except:
             return Response({'error': "User matching query doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -419,7 +402,7 @@ class ResetPasswordConfirm(APIView):
 
 
 class ChangePhoneNumber(APIView):
-    queryset = User.objects.all()
+    queryset = Users.objects.all()
     serializer_class = PhoneSRL
     permission_classes = [AllowAny]
 
@@ -427,7 +410,7 @@ class ChangePhoneNumber(APIView):
     def post(self, request, *args, **kwargs):
         phone_number = request.data.get("phone")
         if phone_number.isdigit() and len(phone_number) > 8:
-            user = User.objects.filter(phone__iexact=phone_number)
+            user = Users.objects.filter(phone__iexact=phone_number)
             if user.exists():
                 return Response({
                     "status": False,
@@ -504,7 +487,7 @@ class ChangePhoneNumberConfirm(APIView):
     @swagger_auto_schema(request_body=PhoneSRL, tags=['Account'])
     def put(self, request, *args, **kwargs):
         try:
-            user = User.objects.get(phone=request.user)
+            user = Users.objects.get(phone=request.user)
         except:
             return Response({'error': "User matching query doesn't exist"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -516,7 +499,7 @@ class ChangePhoneNumberConfirm(APIView):
             ver.step_reset = ''
             ver.delete()
 
-            updated_user = User.objects.get(phone=serializer.data['phone'])
+            updated_user = Users.objects.get(phone=serializer.data['phone'])
             access_token = AccessToken().for_user(updated_user)
             refresh_token = RefreshToken().for_user(updated_user)
 

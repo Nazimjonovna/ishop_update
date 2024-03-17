@@ -2,7 +2,7 @@ from django.db import models
 from Admin.models import Admin, Protsent
 from Partner.models import *
 from django.core.validators import RegexValidator
-from User.models import User
+from User.models import Users
 
 
 class Product(models.Model):
@@ -138,7 +138,7 @@ class RecPro(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product')
     name_credit = models.ForeignKey(Protsent, on_delete = models.CASCADE)
     time = models.DateTimeField(auto_now=True)

@@ -5,7 +5,7 @@ from .models import *
 
 class PhoneSRL(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Users
         fields = ('phone', )
 
 class SendSmsSerializer(serializers.Serializer):
@@ -14,47 +14,26 @@ class SendSmsSerializer(serializers.Serializer):
 
 class OtpSRL(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Users
         fields = ('phone', 'otp')
 
 
 class Register(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Users
         fields = '__all__'
-
-class Credit(serializers.ModelSerializer):
-    class Meta:
-        model = Userdata
-        fields = "__all__"
-
 
 class Log(serializers.ModelSerializer):
     class Meta:
-        model = User
+        model = Users
         fields = ("phone", "password")
 
 
-class Accaunt(serializers.ModelSerializer):
-    user = Register()
-
-    class Meta:
-        model = Userdata
-        fields = "__all__"
-        read_only_fields = ('password', 'phone')
-
-    def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user = User.objects.create(**user_data)
-        userdata = Userdata.objects.create(user=user, **validated_data)
-        return userdata
-
 
 class GetUserInfoSerializer(serializers.ModelSerializer):
-
     class Meta:
-        model=User
-        fields=('id','phone', 'name',  'image')
+        model = Users
+        fields = ('id', 'phone', 'name', 'image')
         read_only_fields = ('password',)
 
 
@@ -64,7 +43,7 @@ class ChangePasswordSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(required=True, write_only=True)
 
     class Meta:
-        model = User
+        model = Users
         fields = ['old_password', 'new_password', 'password2']
 
     def validate(self, attrs):
@@ -109,7 +88,7 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
     re_new_password = serializers.CharField()
 
     class Meta:
-        model = User
+        model = Users
         fields = ('phone', 'new_password', 're_new_password')
 
     def validate(self, attrs):
